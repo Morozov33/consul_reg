@@ -48,10 +48,10 @@ def consul_handler():
         continue_button.click()
         time.sleep(10)
         driver.save_screenshot(f"./screens/{str(datetime.now().date())}.png")
-        logger.info(f"Successed update query in {str(datetime.now())}")
+        logger.info(f"Successed update query")
     else:
         driver.save_screenshot(f"./screens/wrong_{str(datetime.now().date())}.png")
-        logger.error(f"Wrong capture in {str(datetime.now())}")
+        logger.error(f"Wrong capture")
 
     driver.close()
 
