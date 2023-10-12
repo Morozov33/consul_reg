@@ -8,8 +8,9 @@ services:
       context: .
       dockerfile: Dockerfile
     volumes:
-      - ./logs/consul_log.log:/logs/consul_log.log:rw # logs file
+      - ./logs/:/logs/ # logs file
       - ./static/:/static/ # capthures file
+      - ./screens/:/screens/ # screenshots
     env_file:
       - .env
     depends_on:

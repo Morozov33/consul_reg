@@ -1,44 +1,66 @@
 import os
 import sys
+import time
 
-import requests
 from datetime import datetime
+
+import selenium.webdriver
 from loguru import logger
 
 from selenium.webdriver.support.wait import WebDriverWait
 from selenium.webdriver.common.by import By
+from selenium.common.exceptions import NoSuchElementException
+from selenium.webdriver.common.action_chains import ActionChains
 from driver import create_driver
 from twocaptcha import TwoCaptcha
-
 
 
 def consul_handler():
     driver = create_driver()
     link = os.getenv("CONSUL_LINK", "")
     driver.get(link)
+    actions = ActionChains(driver)
     wait = WebDriverWait(driver, 10)
 
     # solve capture
     img = driver.find_element(By.XPATH, '//*[@id="ctl00_MainContent_imgSecNum"]')
-    src = img.get_attribute('src')
-    captcha_path = get_captcha(src)
+    actions.move_to_element(img)
+    actions.perform()
+    # driver.save_screenshot("./screens/0.png")
+    captcha_path = get_captcha(img)
     solved_captcha = get_solved_captcha(captcha_path)
     logger.info(f"Captcha image:{captcha_path}. Captcha solve: {solved_captcha}")
+
+    captcha_response = driver.find_element(By.XPATH, '//*[@id="ctl00_MainContent_txtCode"]')
+    captcha_response.send_keys(solved_captcha)
+    actions.move_to_element(captcha_response)
+    actions.perform()
+    # driver.save_screenshot("./screens/1.png")
+    captcha_response.send_keys(selenium.webdriver.Keys.ENTER)
+    time.sleep(10)
+    footer = driver.find_element(By.XPATH, '//*[@id="footer"]')
+    actions.move_to_element(footer)
+    # driver.save_screenshot("./screens/2.png")
+    try:
+        driver.find_element(By.XPATH, '//*[@id="ctl00_MainContent_lblCodeErr"]')
+    except NoSuchElementException:
+        continue_button = driver.find_element(By.XPATH, '//*[@id="ctl00_MainContent_ButtonB"]')
+        continue_button.click()
+        time.sleep(10)
+        driver.save_screenshot(f"./screens/{str(datetime.now().date())}.png")
+        logger.info(f"Successed update query in {str(datetime.now())}")
+    else:
+        logger.error("Wrong capture")
 
     driver.close()
 
 
-def get_captcha(src: str) -> str:
-    # download the image
-    request_image = requests.get(src, stream=True)
-    if request_image.status_code == 200:
-        file_name = f"captcha_{str(datetime.now().date())}.jpg"
-        file_path = os.path.join(os.getenv("CAPTCHA_IMG_PATH", ""), file_name)
-        with open(file_path, "wb") as f:
-            for chunk in request_image:
-                f.write(chunk)
-
-        return file_path
+def get_captcha(img) -> str:
+    # download the image as screenshot
+    file_name = f"captcha_{str(datetime.now().date())}.png"
+    file_path = os.path.join(os.getenv("CAPTCHA_IMG_PATH", ""), file_name)
+    img.screenshot(file_path)
+    return file_path
 
 
 def get_solved_captcha(captcha_path: str) -> int:
