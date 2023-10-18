@@ -5,12 +5,15 @@ import time
 from datetime import datetime
 
 import selenium.webdriver
+import loguru
 from loguru import logger
 
 from selenium.webdriver.support.wait import WebDriverWait
 from selenium.webdriver.common.by import By
 from selenium.common.exceptions import NoSuchElementException
 from selenium.webdriver.common.action_chains import ActionChains
+
+from app.sender import sent_message_into_queue
 from driver import create_driver
 from twocaptcha import TwoCaptcha
 
@@ -48,10 +51,12 @@ def consul_handler():
         continue_button.click()
         time.sleep(10)
         driver.save_screenshot(f"./screens/{str(datetime.now().date())}.png")
-        logger.info(f"Successed update query")
+        sent_message_into_queue(f"{str(datetime.now().date())} | Successed update query")
+        logger.info("Successed update query")
     else:
         driver.save_screenshot(f"./screens/wrong_{str(datetime.now().date())}.png")
-        logger.error(f"Wrong capture")
+        sent_message_into_queue(f"{str(datetime.now().date())} | Wrong capture")
+        logger.error("Wrong capture")
 
     driver.close()
 
