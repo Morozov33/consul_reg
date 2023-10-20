@@ -5,7 +5,6 @@ import time
 from datetime import datetime
 
 import selenium.webdriver
-import loguru
 from loguru import logger
 
 from selenium.webdriver.support.wait import WebDriverWait
@@ -13,7 +12,7 @@ from selenium.webdriver.common.by import By
 from selenium.common.exceptions import NoSuchElementException
 from selenium.webdriver.common.action_chains import ActionChains
 
-from app.sender import sent_message_into_queue
+from sender import sent_message_into_queue
 from driver import create_driver
 from twocaptcha import TwoCaptcha
 
