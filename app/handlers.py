@@ -51,11 +51,11 @@ def consul_handler():
         continue_button.click()
         time.sleep(10)
         driver.save_screenshot(f"./screens/{str(datetime.now().date())}.png")
-        sent_message_into_queue(f"{str(datetime.now().date())} | Successed update query")
+        sent_message_into_queue(f"Log from consul_reg: {str(datetime.now().date())} | Successed update query")
         logger.info("Successed update query")
     else:
         driver.save_screenshot(f"./screens/wrong_{str(datetime.now().date())}.png")
-        sent_message_into_queue(f"{str(datetime.now().date())} | Wrong capture")
+        sent_message_into_queue(f"Log from consul_reg: {str(datetime.now().date())} | Wrong capture")
         logger.error("Wrong capture")
 
     driver.close()
