@@ -14,12 +14,14 @@ names_links = {
 
 
 if __name__ == '__main__':
-    try:
-        logger.add(LOG_PATH)
-        driver = create_driver()
-        for name in names_links:
+    logger.add(LOG_PATH)
+    driver = create_driver()
+
+    for name in names_links:
+        try:
             consul_handler(name, names_links[name], driver)
-    except Exception as e:
-        logger.exception(e)
-    finally:
-        driver.close()
+        except Exception as e:
+            logger.exception(e)
+            continue
+
+    driver.close()
