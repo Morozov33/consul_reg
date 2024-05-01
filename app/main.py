@@ -7,10 +7,7 @@ from driver import create_driver
 LOG_PATH = os.environ.get("LOG_PATH")
 LINKS = list(os.getenv("CONSUL_LINKS", "").split(","))
 NAMES = list(os.getenv("NAMES", "").split(","))
-names_links = {
-    NAMES[0]: LINKS[0],
-    NAMES[1]: LINKS[1],
-}
+names_links = {NAMES[i]: LINKS[i] for i in range(len(min(NAMES, LINKS)))}
 
 
 if __name__ == '__main__':
